@@ -148,29 +148,23 @@ if __name__ == "__main__":
     # Cache Max Fitness
     max_fitness = 0
 
-    # # Each generation has the same start and finish points
-    # # Generate start position
-    # f_px_pos_x, f_px_pos_y = random_position()
-    # p_px_pos_x, p_px_pos_y = f_px_pos_x, f_px_pos_y
-    #
-    # # Generate target's position and check if target is at same position as start flag
-    # t_px_pos_x, t_px_pos_y = random_position()
-    # while abs(t_px_pos_x - p_px_pos_x) < block_size * 5 and abs(t_px_pos_y - p_px_pos_y) < block_size * 5:
-    #     t_px_pos_x, t_px_pos_y = random_position()
-
-    # Main loop
+    # Each generation has the same start and finish points
+    # Generate start position
     f_px_pos_x, f_px_pos_y = random_position()
     p_px_pos_x, p_px_pos_y = f_px_pos_x, f_px_pos_y
+
+    # Generate target's position and check if target is at same position as start flag
     t_px_pos_x, t_px_pos_y = random_position()
     while abs(t_px_pos_x - p_px_pos_x) < block_size * 5 and abs(t_px_pos_y - p_px_pos_y) < block_size * 5:
         t_px_pos_x, t_px_pos_y = random_position()
+
+    # Main loop
     for generation in range(0, generations):
+        # Every 10 generations, change the target's position
         div, res = divmod(generation, 10)
         if res == 0:
-            # Player pixel position for drawing
             f_px_pos_x, f_px_pos_y = random_position()
             p_px_pos_x, p_px_pos_y = f_px_pos_x, f_px_pos_y
-            # Generate target's position and check if target is at same position as start flag
             t_px_pos_x, t_px_pos_y = random_position()
             while abs(t_px_pos_x - p_px_pos_x) < block_size * 5 and abs(t_px_pos_y - p_px_pos_y) < block_size * 5:
                 t_px_pos_x, t_px_pos_y = random_position()

@@ -63,19 +63,19 @@ class GeneticANN(Sequential):
                 Dense(
                     self.i_size,
                     input_shape=(self.i_size,),
-                    activation='sigmoid',
+                    activation='tanh',
                     weights=[child_weights[0], np.zeros(self.i_size)])
             )
             self.add(
                 Dense(
                     self.h1_size,
-                    activation='sigmoid',
+                    activation='tanh',
                     weights=[child_weights[1], np.zeros(self.h1_size)])
             )
             self.add(
                 Dense(
                     self.h2_size,
-                    activation='sigmoid',
+                    activation='tanh',
                     weights=[child_weights[2], np.zeros(self.h2_size)])
             )
             self.add(
@@ -85,25 +85,8 @@ class GeneticANN(Sequential):
                     weights=[child_weights[3], np.zeros(self.o_size)])
             )
 
-    # # Function for forward propagating a row vector of a matrix
-    # def forward_propagation(self, X_train, y_train):
-    #     # Forward propagation
-    #     y_h = self.predict(X_train.values)
-    #     # Compute fitness score
-    #     self.fitness = accuracy_score(y_train, y_h.round())
-
     def fitness_update(self, distance, step):
         self.fitness = (1 - distance / 28.2842712475)
-
-
-# # Standard Backpropagation
-# def compile_train(nn, X_train, y_train, epochs):
-#     nn.compile(
-#         optimizer='rmsprop',
-#         loss='binary_crossentropy',
-#         metrics=['accuracy']
-#     )
-#     nn.fit(X_train.values, y_train.values, epochs=epochs)
 
 
 # Chance to mutate weights
@@ -117,27 +100,16 @@ def mutation(child_weights):
         # No mutation
         pass
 
-    # Crossover traits between two Genetic Neural Networks
 
-
+# Crossover traits between two Genetic Neural Networks
 def dynamic_crossover(nn1, nn2):
     # A new child is born
     child = GeneticANN()
     child.compile()
-    # Lists for respective weights
-    # nn1_weights = []
-    # nn2_weights = []
     child_weights_l1 = [np.zeros((5, 5)), np.zeros(5, )]
     child_weights_l2 = [np.zeros((5, 5)), np.zeros(5, )]
     child_weights_l3 = [np.zeros((5, 5)), np.zeros(5, )]
     child_weights_l4 = [np.zeros((5, 4)), np.zeros(4, )]
-    # Get all weights from all layers in the first network
-    # for lyr in nn1.layers:
-    #     nn1_weights.append(lyr.get_weights()[0])
-    #
-    # # Get all weights from all layers in the second network
-    # for lyr in nn2.layers:
-    #     nn2_weights.append(lyr.get_weights()[0])
 
     # Layer 1
     for w_I in range(0, nn1.i_size):
@@ -207,20 +179,4 @@ def dynamic_crossover(nn1, nn2):
     mutation(child_weights_l4)
     child.layers[3].set_weights(child_weights_l4)
 
-    # # Iterate through all weights from all layers for crossover
-    # for a in range(0, len(nn1_weights)):
-    #     # Get single point to split the matrix in parents based on # of cols
-    #     split = random.randint(0, np.shape(nn1_weights[a])[1] - 1)
-    #     # Iterate through after a single point and set the remaining cols to nn_2
-    #     for b in range(split, np.shape(nn1_weights[a])[1] - 1):
-    #         nn1_weights[a][:, b] = nn2_weights[a][:, b]
-    #
-    #     # After crossover add weights to child
-    #     child_weights.append(nn1_weights[a])
-
-    # # Add a chance for mutation
-    # mutation(child_weights)
-    #
-    # # Create and return child object
-    # child = GeneticANN(child_weights)
     return child
