@@ -43,12 +43,13 @@ class GeneticANN(Sequential):
         # Initialize Sequential Model Super Class
         super().__init__()
         self.fitness = 0
+        self.max_fitness = 0
         # If no weights provided randomly generate them
         if child_weights is None:
             # Layers are created and randomly generated
-            layer1 = Dense(self.i_size, input_shape=(self.i_size,), activation='sigmoid')
-            layer2 = Dense(self.h1_size, activation='sigmoid')
-            layer3 = Dense(self.h2_size, activation='sigmoid')
+            layer1 = Dense(self.i_size, input_shape=(self.i_size,), activation='tanh', bias_initializer='random_normal')
+            layer2 = Dense(self.h1_size, activation='tanh')
+            layer3 = Dense(self.h2_size, activation='tanh')
             layer4 = Dense(self.o_size, activation='softmax')
             # Layers are added to the model
             self.add(layer1)
@@ -91,8 +92,8 @@ class GeneticANN(Sequential):
     #     # Compute fitness score
     #     self.fitness = accuracy_score(y_train, y_h.round())
 
-    def fitness_update(self, distance):
-        self.fitness = (1 - distance / 10)
+    def fitness_update(self, distance, step):
+        self.fitness = (1 - distance / 28.2842712475)
 
 
 # # Standard Backpropagation
@@ -110,8 +111,8 @@ def mutation(child_weights):
     # Add a chance for random mutation
     selection = random.randint(0, len(child_weights) - 1)
     mut = random.uniform(0, 1)
-    if mut >= .3:
-        child_weights[selection] *= random.random()
+    if mut >= .2:
+        child_weights[selection] *= random.random()*2
     else:
         # No mutation
         pass
@@ -120,32 +121,106 @@ def mutation(child_weights):
 
 
 def dynamic_crossover(nn1, nn2):
+    # A new child is born
+    child = GeneticANN()
+    child.compile()
     # Lists for respective weights
-    nn1_weights = []
-    nn2_weights = []
-    child_weights = []
+    # nn1_weights = []
+    # nn2_weights = []
+    child_weights_l1 = [np.zeros((5, 5)), np.zeros(5, )]
+    child_weights_l2 = [np.zeros((5, 5)), np.zeros(5, )]
+    child_weights_l3 = [np.zeros((5, 5)), np.zeros(5, )]
+    child_weights_l4 = [np.zeros((5, 4)), np.zeros(4, )]
     # Get all weights from all layers in the first network
-    for lyr in nn1.layers:
-        nn1_weights.append(lyr.get_weights()[0])
+    # for lyr in nn1.layers:
+    #     nn1_weights.append(lyr.get_weights()[0])
+    #
+    # # Get all weights from all layers in the second network
+    # for lyr in nn2.layers:
+    #     nn2_weights.append(lyr.get_weights()[0])
 
-    # Get all weights from all layers in the second network
-    for lyr in nn2.layers:
-        nn2_weights.append(lyr.get_weights()[0])
+    # Layer 1
+    for w_I in range(0, nn1.i_size):
+        for w_J in range(0, nn1.i_size):
+            roll_d20 = random.randint(0, 20)
+            if roll_d20 < 12:
+                child_weights_l1[0][w_I, w_J] = nn1.layers[0].kernel[w_I, w_J]
+            else:
+                child_weights_l1[0][w_I, w_J] = nn2.layers[0].kernel[w_I, w_J]
+    for b_I in range(0, nn1.i_size):
+        roll_d20 = random.randint(0, 20)
+        if roll_d20 < 12:
+            child_weights_l1[1][b_I] = nn1.layers[0].bias[b_I]
+        else:
+            child_weights_l1[1][b_I] = nn2.layers[0].bias[b_I]
+    mutation(child_weights_l1)
+    child.layers[0].set_weights(child_weights_l1)
 
-    # Iterate through all weights from all layers for crossover
-    for a in range(0, len(nn1_weights)):
-        # Get single point to split the matrix in parents based on # of cols
-        split = random.randint(0, np.shape(nn1_weights[a])[1] - 1)
-        # Iterate through after a single point and set the remaining cols to nn_2
-        for b in range(split, np.shape(nn1_weights[a])[1] - 1):
-            nn1_weights[a][:, b] = nn2_weights[a][:, b]
+    # Layer 2
+    for w_I in range(0, nn1.i_size):
+        for w_J in range(0, nn1.h1_size):
+            roll_d20 = random.randint(0, 20)
+            if roll_d20 < 12:
+                child_weights_l2[0][w_I, w_J] = nn1.layers[1].kernel[w_I, w_J]
+            else:
+                child_weights_l2[0][w_I, w_J] = nn2.layers[1].kernel[w_I, w_J]
+    for b_I in range(0, nn1.h1_size):
+        roll_d20 = random.randint(0, 20)
+        if roll_d20 < 12:
+            child_weights_l2[1][b_I] = nn1.layers[1].bias[b_I]
+        else:
+            child_weights_l2[1][b_I] = nn2.layers[1].bias[b_I]
+    mutation(child_weights_l2)
+    child.layers[1].set_weights(child_weights_l2)
 
-        # After crossover add weights to child
-        child_weights.append(nn1_weights[a])
+    # Layer 3
+    for w_I in range(0, nn1.h1_size):
+        for w_J in range(0, nn1.h2_size):
+            roll_d20 = random.randint(0, 20)
+            if roll_d20 < 12:
+                child_weights_l3[0][w_I, w_J] = nn1.layers[2].kernel[w_I, w_J]
+            else:
+                child_weights_l3[0][w_I, w_J] = nn2.layers[2].kernel[w_I, w_J]
+    for b_I in range(0, nn1.h2_size):
+        roll_d20 = random.randint(0, 20)
+        if roll_d20 < 12:
+            child_weights_l3[1][b_I] = nn1.layers[2].bias[b_I]
+        else:
+            child_weights_l3[1][b_I] = nn2.layers[2].bias[b_I]
+    mutation(child_weights_l3)
+    child.layers[2].set_weights(child_weights_l3)
 
-    # Add a chance for mutation
-    mutation(child_weights)
+    # Layer 4
+    for w_I in range(0, nn1.h2_size):
+        for w_J in range(0, nn1.o_size):
+            roll_d20 = random.randint(0, 20)
+            if roll_d20 < 12:
+                child_weights_l4[0][w_I, w_J] = nn1.layers[3].kernel[w_I, w_J]
+            else:
+                child_weights_l4[0][w_I, w_J] = nn2.layers[3].kernel[w_I, w_J]
+    for b_I in range(0, nn1.o_size):
+        roll_d20 = random.randint(0, 20)
+        if roll_d20 < 12:
+            child_weights_l4[1][b_I] = nn1.layers[3].bias[b_I]
+        else:
+            child_weights_l4[1][b_I] = nn2.layers[3].bias[b_I]
+    mutation(child_weights_l4)
+    child.layers[3].set_weights(child_weights_l4)
 
-    # Create and return child object
-    child = GeneticANN(child_weights)
+    # # Iterate through all weights from all layers for crossover
+    # for a in range(0, len(nn1_weights)):
+    #     # Get single point to split the matrix in parents based on # of cols
+    #     split = random.randint(0, np.shape(nn1_weights[a])[1] - 1)
+    #     # Iterate through after a single point and set the remaining cols to nn_2
+    #     for b in range(split, np.shape(nn1_weights[a])[1] - 1):
+    #         nn1_weights[a][:, b] = nn2_weights[a][:, b]
+    #
+    #     # After crossover add weights to child
+    #     child_weights.append(nn1_weights[a])
+
+    # # Add a chance for mutation
+    # mutation(child_weights)
+    #
+    # # Create and return child object
+    # child = GeneticANN(child_weights)
     return child
