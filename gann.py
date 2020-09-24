@@ -85,7 +85,7 @@ class GeneticANN(Sequential):
                     weights=[child_weights[3], np.zeros(self.o_size)])
             )
 
-    def fitness_update(self, distance, step):
+    def fitness_update(self, distance):
         self.fitness = (1 - distance / 28.2842712475)
 
 
@@ -94,7 +94,7 @@ def mutation(child_weights):
     # Add a chance for random mutation
     selection = random.randint(0, len(child_weights) - 1)
     mut = random.uniform(0, 1)
-    if mut >= .2:
+    if mut >= .5:
         child_weights[selection] *= random.random()*2
     else:
         # No mutation
@@ -115,13 +115,13 @@ def dynamic_crossover(nn1, nn2):
     for w_I in range(0, nn1.i_size):
         for w_J in range(0, nn1.i_size):
             roll_d20 = random.randint(0, 20)
-            if roll_d20 < 12:
+            if roll_d20 < 15:
                 child_weights_l1[0][w_I, w_J] = nn1.layers[0].kernel[w_I, w_J]
             else:
                 child_weights_l1[0][w_I, w_J] = nn2.layers[0].kernel[w_I, w_J]
     for b_I in range(0, nn1.i_size):
         roll_d20 = random.randint(0, 20)
-        if roll_d20 < 12:
+        if roll_d20 < 15:
             child_weights_l1[1][b_I] = nn1.layers[0].bias[b_I]
         else:
             child_weights_l1[1][b_I] = nn2.layers[0].bias[b_I]
@@ -132,13 +132,13 @@ def dynamic_crossover(nn1, nn2):
     for w_I in range(0, nn1.i_size):
         for w_J in range(0, nn1.h1_size):
             roll_d20 = random.randint(0, 20)
-            if roll_d20 < 12:
+            if roll_d20 < 15:
                 child_weights_l2[0][w_I, w_J] = nn1.layers[1].kernel[w_I, w_J]
             else:
                 child_weights_l2[0][w_I, w_J] = nn2.layers[1].kernel[w_I, w_J]
     for b_I in range(0, nn1.h1_size):
         roll_d20 = random.randint(0, 20)
-        if roll_d20 < 12:
+        if roll_d20 < 15:
             child_weights_l2[1][b_I] = nn1.layers[1].bias[b_I]
         else:
             child_weights_l2[1][b_I] = nn2.layers[1].bias[b_I]
@@ -149,13 +149,13 @@ def dynamic_crossover(nn1, nn2):
     for w_I in range(0, nn1.h1_size):
         for w_J in range(0, nn1.h2_size):
             roll_d20 = random.randint(0, 20)
-            if roll_d20 < 12:
+            if roll_d20 < 15:
                 child_weights_l3[0][w_I, w_J] = nn1.layers[2].kernel[w_I, w_J]
             else:
                 child_weights_l3[0][w_I, w_J] = nn2.layers[2].kernel[w_I, w_J]
     for b_I in range(0, nn1.h2_size):
         roll_d20 = random.randint(0, 20)
-        if roll_d20 < 12:
+        if roll_d20 < 15:
             child_weights_l3[1][b_I] = nn1.layers[2].bias[b_I]
         else:
             child_weights_l3[1][b_I] = nn2.layers[2].bias[b_I]
@@ -166,13 +166,13 @@ def dynamic_crossover(nn1, nn2):
     for w_I in range(0, nn1.h2_size):
         for w_J in range(0, nn1.o_size):
             roll_d20 = random.randint(0, 20)
-            if roll_d20 < 12:
+            if roll_d20 < 15:
                 child_weights_l4[0][w_I, w_J] = nn1.layers[3].kernel[w_I, w_J]
             else:
                 child_weights_l4[0][w_I, w_J] = nn2.layers[3].kernel[w_I, w_J]
     for b_I in range(0, nn1.o_size):
         roll_d20 = random.randint(0, 20)
-        if roll_d20 < 12:
+        if roll_d20 < 15:
             child_weights_l4[1][b_I] = nn1.layers[3].bias[b_I]
         else:
             child_weights_l4[1][b_I] = nn2.layers[3].bias[b_I]
