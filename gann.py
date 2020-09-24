@@ -31,8 +31,8 @@ class GeneticANN(Sequential):
     # Target x, y
     # Distance
     i_size = 5
-    h1_size = 5
-    h2_size = 5
+    h1_size = 10
+    h2_size = 8
     o_size = 4
 
     # Outputs
@@ -43,6 +43,7 @@ class GeneticANN(Sequential):
         # Initialize Sequential Model Super Class
         super().__init__()
         self.fitness = 0
+        self.mean_fitness = 0
         self.max_fitness = 0
         # If no weights provided randomly generate them
         if child_weights is None:
@@ -106,10 +107,10 @@ def dynamic_crossover(nn1, nn2):
     # A new child is born
     child = GeneticANN()
     child.compile()
-    child_weights_l1 = [np.zeros((5, 5)), np.zeros(5, )]
-    child_weights_l2 = [np.zeros((5, 5)), np.zeros(5, )]
-    child_weights_l3 = [np.zeros((5, 5)), np.zeros(5, )]
-    child_weights_l4 = [np.zeros((5, 4)), np.zeros(4, )]
+    child_weights_l1 = [np.zeros((nn1.i_size, nn1.i_size)), np.zeros(nn1.i_size, )]
+    child_weights_l2 = [np.zeros((nn1.i_size, nn1.h1_size)), np.zeros(nn1.h1_size, )]
+    child_weights_l3 = [np.zeros((nn1.h1_size, nn1.h2_size)), np.zeros(nn1.h2_size, )]
+    child_weights_l4 = [np.zeros((nn1.h2_size, nn1.o_size)), np.zeros(nn1.o_size, )]
 
     # Layer 1
     for w_I in range(0, nn1.i_size):

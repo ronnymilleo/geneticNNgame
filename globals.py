@@ -1,0 +1,9 @@
+width = 1440
+height = 720
+b_size = 32
+left_margin = 40
+right_margin = b_size * 20
+up_margin = 60
+down_margin = 20
+generations = 100
+population = 20
