@@ -1,6 +1,8 @@
 import math
-import os.path
+import os
+import pathlib
 import random
+from os.path import join
 
 import numpy as np
 import pygame
@@ -47,7 +49,7 @@ def draw_fit_table(screen, font, players):
     screen.blits([(player_text, (720, 60)),
                   (fitness_text, (720 + 100, 60)),
                   (steps_text, (720 + 200, 60))])
-    half_players = len(players)//2
+    half_players = len(players) // 2
     for p in range(0, len(players)):
         player_id = font.render("P{}".format(p), True, [0, 0, 0], [255, 255, 255])
         fitness_number = font.render("{:.4f}".format(players[p].nn.fitness), True, [0, 0, 0],
@@ -101,13 +103,13 @@ def random_position():
 def move(p: Player):
     # Configure inputs of neural network and evaluate outputs
     nn_input = [(p.x / 20,
-                p.y / 20,
-                p.distance / 26.87,
-                p.quadrant / 4,
-                p.x_angle,
-                p.y_angle,
-                x_conv(t_px_pos_x) / 20,
-                y_conv(t_px_pos_y) / 20), ]
+                 p.y / 20,
+                 p.distance / 26.87,
+                 p.quadrant / 4,
+                 p.x_angle,
+                 p.y_angle,
+                 x_conv(t_px_pos_x) / 20,
+                 y_conv(t_px_pos_y) / 20), ]
     input_tensor = tf.convert_to_tensor(nn_input)
     p.nn_output = p.nn(input_tensor, training=False)
     if np.argmax(p.nn_output) == 0:
@@ -216,19 +218,17 @@ def update_generation(generation, players, children):
     # Log the current generation
     print('Generation: ', generation)
 
-    fitness_ranking = []
-    for p in range(1, population + 1):
-        fitness_ranking.append(players[p].nn)
+    # fitness_ranking = []
+    # for p in range(1, population + 1):
+    #     fitness_ranking.append(players[p].nn)
 
     # Sort based on fitness
-    fitness_ranking = sorted(fitness_ranking, key=lambda x: x.fitness)
+    fitness_ranking = sorted(players, key=lambda x: x.nn.fitness)
     fitness_ranking.reverse()
 
-    # # Find Max Fitness and Log Associated Weights
-    # for i in range(0, len(fitness_ranking)):
-    #     # If there is a new max fitness among the population
-    #     if fitness_ranking[i].max_fitness > max_fitness:
-    #         fitness_ranking[i].save_weights('best_nn_weights')
+    # Save the best 5 every generation (overwrite previous)
+    for i in range(0, 5):
+        fitness_ranking[i].nn.save(pathlib.Path(join(os.getcwd(), 'model_{}.h5'.format(i))))
 
     # Generate random weights for children every generation
     for c in children:
@@ -239,7 +239,7 @@ def update_generation(generation, players, children):
     for i in range(0, 5):
         for j in range(0, 5):
             # Create a child and add to networks
-            children[k].nn = gann.dynamic_crossover(fitness_ranking[i], fitness_ranking[j])
+            children[k].nn = gann.dynamic_crossover(fitness_ranking[i].nn, fitness_ranking[j].nn)
             k += 1
 
     # Substitute population's neural networks
